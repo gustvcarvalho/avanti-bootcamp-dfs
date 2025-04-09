@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model categoria {
+  id             Int    @id @default(autoincrement())
+  nome_categoria String @db.VarChar(100)
+  item           item[]
+}
+
+model item {
+  id           Int       @id @default(autoincrement())
+  nome_objeto  String    @db.VarChar(100)
+  dataevento   DateTime  @db.Timestamp(6)
+  localizacao  String    @db.VarChar(150)
+  status       Int
+  codigoacesso String    @unique @db.VarChar(36)
+  categoria_id Int
+  usuario_id   Int
+  categoria    categoria @relation(fields: [categoria_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  usuarios     usuarios @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+}
+
+model status_item {
+  id        Int    @id @default(autoincrement())
+  descricao String @db.VarChar(50)
+}
+
+model usuarios {
+  id       Int    @id @default(autoincrement())
+  nome     String @db.VarChar(100)
+  email    String @unique @db.VarChar(100)
+  telefone String @unique @db.VarChar(20)
+  senha    String @db.VarChar(100)
+  item     item[]
+}
