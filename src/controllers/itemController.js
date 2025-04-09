@@ -102,19 +102,24 @@ module.exports = {
             nome_objeto,dataevento,localizacao,status,categoria_id,usuario_id} = req.body;
     
         try {
+            const codigo = nanoid(8);
             const novoItem = await prisma.item.create({
                 data: {
                     nome_objeto,
                     dataevento: new Date(dataevento),
                     localizacao,
                     status,
-                    codigoacesso: nanoid(8),
+                    codigoacesso: codigo,
                     categoria_id,
                     usuario_id
                 }
             });
     
-            res.status(201).json(novoItem);
+            res.status(201).json({
+                mensagem: 'Item cadastrado com sucesso!',
+                codigoacesso: codigo,
+                item: novoItem
+            });
         }catch (error) {
             console.error('Erro ao cadastrar item:', error);
             res.status(500).json({error: 'Erro ao cadastrar item'})
