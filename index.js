@@ -6,11 +6,13 @@ const app = express();
 const prisma = new PrismaClient();
 
 const usuarioRoutes = require('./src/routes/usuarioRoutes');
+const itemRoutes = require('./src/routes/itemRoutes');
 
 app.use(cors());
 app.use(express.json());
 
 app.use('/usuarios', usuarioRoutes);
+app.use('/itens', itemRoutes);
 
 const PORT = process.env.PORT || 3000;
 

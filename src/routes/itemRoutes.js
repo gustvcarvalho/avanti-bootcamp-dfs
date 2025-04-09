@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const itemController = require('../controllers/itemController');
 
-router.get('/itens', itemController.listarItens);
+router.get('/', itemController.listarItens);
 router.get('/perdidos', itemController.listarItensPerdidos);
 router.get('/achados', itemController.listarItensAchados);
 router.get('/codigo/:codigoacesso', itemController.listarItemPorCodigo);

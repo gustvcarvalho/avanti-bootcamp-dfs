@@ -23,9 +23,19 @@ module.exports = {
                     email,
                     telefone,
                     senha
+                },
+
+                select: {
+                    id: true,
+                    nome: true,
+                    email: true,
+                    telefone: true
                 }
             });
-            res.status(201).json(novoUsuario);
+            res.status(201).json({
+                mensagem: 'Usuário cadastrado com sucesso!',
+                usuario: novoUsuario
+            });
         }catch (error) {
             console.error('Erro ao cadastrar novo Usuário:', error);
             res.status(500).json({error: 'Erro ao cadastrar novo usuário'});
@@ -43,9 +53,20 @@ module.exports = {
                 nome,
                 email,
                 telefone
+            },
+
+            select: {
+                id: true,
+                nome: true,
+                email: true,
+                telefone: true
             }
+            
            });
-           return res.status(200).json(usuarioAtualizado)
+           return res.status(200).json({
+            mensagem: 'Usuarário atualizado com sucesso!',
+            usuario: usuarioAtualizado
+           });
         }catch (error) {
             console.error('Erro ao atualizar usuário');
             res.status(500).json({error: 'Erro ao atualizar usuário'});
