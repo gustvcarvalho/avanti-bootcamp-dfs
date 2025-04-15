@@ -29,6 +29,34 @@ module.exports = {
     async cadastrarUsuario(req, res) {
         const { nome, email, telefone, senha } = req.body;
 
+        if (!nome || !email || !telefone || !senha) {
+            return res.status(400).json({
+                status: 'erro',
+                mensagem: 'Todos os campos são obrigatórios'
+            })
+        };
+
+        if (!email.includes('@') || !email.includes('.')) {
+            return res.status(400).json({
+                status: 'erro',
+                mensagem: 'Formato de e-mail inválido'
+            })
+        };
+
+        if (telefone.length < 10 || telefone.length > 15) {
+            return res.status(400).json({
+                status: 'erro',
+                mensagem: 'Formato de telefone inválido'
+            })
+        };
+
+        if (senha.length < 6) {
+            return res.status(400).json({
+                status: 'erro',
+                mensagem: 'A senha deve ter no mínimo 6 caracteres'
+            })
+        };
+
         try {
             const novoUsuario = await prisma.usuarios.create({
                 data: {
@@ -65,14 +93,41 @@ module.exports = {
         const { id } = req.params;
         const { nome, email, telefone } = req.body
 
+        const dadosAtualizacao = {};
+
+        if (nome) dadosAtualizacao.nome = nome;
+        if (email) {
+            if (!email.includes('@') || !email.includes('.')) {
+                return res.status(400).json({
+                    status: 'erro',
+                    mensagem: 'E-mail inválido'
+                });
+            }
+
+            dadosAtualizacao.email = email;
+        }
+
+        if (telefone) {
+            if (telefone.length < 10 || telefone.length > 15) {
+                return res.status(400).json({
+                    status: 'erro',
+                    mensagem: 'Telefone deve ter entre 10 e 15 dígitos'
+                });
+            }
+            dadosAtualizacao.telefone = telefone;
+        }
+
+        if (Object.keys(dadosAtualizacao).length === 0) {
+            return res.status(400).json({
+                status: 'erro',
+                mensagem: 'Nenhum campo válido enviado para atualização'
+            });
+        }
+
         try {
             const usuarioAtualizado = await prisma.usuarios.update({
                 where: { id: Number(id) },
-                data: {
-                    nome,
-                    email,
-                    telefone
-                },
+                data: dadosAtualizacao,
 
                 select: {
                     id: true,
@@ -84,7 +139,7 @@ module.exports = {
             });
             return res.status(200).json({
                 status: 'sucesso',
-                mensagem: 'Usuarário atualizado com sucesso!',
+                mensagem: 'Usuário atualizado com sucesso!',
                 dados: usuarioAtualizado
             });
 
