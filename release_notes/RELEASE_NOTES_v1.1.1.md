@@ -1,7 +1,7 @@
 # 📦 Release Notes - Achados e Perdidos API
 
 ## Versão: 1.2.0
-📅 Data: 2025-04-16
+📅 Data: 16 de abril 2025
 
 ---
 
