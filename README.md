@@ -1,4 +1,3 @@
-
 # 📦 Avanti Bootcamp - Achados e Perdidos API
 
 Este projeto é uma API RESTful desenvolvida como parte de um bootcamp, com o objetivo de gerenciar objetos perdidos e encontrados em um ambiente como escolas, empresas ou eventos.  
@@ -20,6 +19,17 @@ Atualmente, o projeto consiste apenas no backend utilizando Node.js, Express e P
 git clone https://github.com/davidbrennerm/avanti-bootcamp-dfs.git
 cd avanti-bootcamp-dfs
 ```
+
+### 📦 Dependências principais
+
+| Pacote           | Descrição                                                                 |
+|------------------|---------------------------------------------------------------------------|
+| **express**      | Framework web leve e flexível para APIs                                   |
+| **cors**         | Middleware para liberação de requisições externas (CORS)                  |
+| **prisma**       | ORM moderno e eficiente para trabalhar com PostgreSQL                     |
+| **@prisma/client**| Cliente Prisma gerado automaticamente com base no schema                |
+| **pg**           | Driver PostgreSQL para Node.js                                            |
+| **nanoid**       | Gerador de identificadores únicos curtos (código de acesso)               |
 
 ## 📦 Instalando dependências
 
@@ -68,6 +78,7 @@ npx prisma generate
 ## ▶️ Rodando o servidor
 
 ```bash
+npm run seed
 npm run dev
 ```
 
@@ -97,7 +108,7 @@ Servidor rodando em http://localhost:3000
   "nome_objeto": "Celular Motorola",
   "dataevento": "2025-04-06T15:30:00Z",
   "localizacao": "Bloco A - Corredor 2",
-  "status": 0,
+  "status": "perdido",
   "categoria_id": 2,
   "usuario_id": 1
 }
@@ -110,13 +121,28 @@ Servidor rodando em http://localhost:3000
 - `GET /usuarios` – Lista todos os usuários
 - `POST /usuarios` – Cria um novo usuário
 - `PUT /usuarios/:id` – Atualiza as informações de um usuário
-- `DELETE /usuarios/:id` – Deleta um usuário
+- `DELETE /usuarios/:id` – Deleta um usuário (e seus itens)
 
 ### Item
 
-- `GET /itens` – Lista todos os itens
-- `POST /itens` – Cria um novo item
-- `PUT /itens/:id` – Atualiza as informações de um item
-- `DELETE /itens/:id` – Deleta um item
+- `GET /itens` – Listar itens
+- `GET /itens/perdidos` – Listar apenas itens com status `0`
+- `GET /itens/achados` – Listar apenas itens com status `1`
+- `GET /itens/codigo/:codigoacesso` – Buscar item por código
+- `POST /itens` – Cadastrar item (gera código de acesso automaticamente)
+- `PUT /itens/:id` – Atualiza as informações de um item pelo ID
+- `PUT /itens/codigo/:codigoacesso` – Atualizar item via código de acesso
+- `DELETE /itens/:id` – Deleta um item pelo ID
+- `DELETE /itens/codigo/:codigoacesso` – Deleta item via código de acesso
 
+## 👤 Desenvolvedores
+
+- David Martins
+
+- Eduarda Burity Gonçalves
+
+- Gustavo Ferraz Carvalho
+
+- Guilherme de Souza França
+  
 > Rotas e funcionalidades podem ser expandidas à medida que o projeto evolui.
