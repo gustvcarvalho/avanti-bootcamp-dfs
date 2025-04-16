@@ -2,17 +2,25 @@ const { prisma } = require('../database/prismaClient');
 const { v4: uuidv4 } = require('uuid');
 const { nanoid } = require('nanoid');
 
+const statusMap = {
+    perdido: 0,
+    encontrado: 1
+};
+
+function formatarStatus(valor) {
+    return statusMap[String(valor)?.toLowerCase()];
+}
+
 module.exports = {
-
     async listarItens(req, res) {
-
-        const { status, categoria_id, codigoacesso, localizacao } = req.query;
+        const { status, categoria_id, localizacao } = req.query;
 
         try {
             const filtros = {};
 
             if (status !== undefined) {
-                filtros.status = Number(status);
+                const statusFormatado = formatarStatus(status) ?? Number(status);
+                if (!isNaN(statusFormatado)) filtros.status = statusFormatado;
             }
 
             if (categoria_id !== undefined) {
@@ -23,24 +31,25 @@ module.exports = {
                 filtros.localizacao = {
                     contains: localizacao,
                     mode: 'insensitive'
-                }
-            };
+                };
+            }
 
             const listaDeItens = await prisma.item.findMany({
                 where: filtros,
                 include: {
-                    usuarios: {
-                        select: { nome: true, email: true }
-                    },
-                    categoria: {
-                        select: { nome_categoria: true }
-                    }
+                    usuarios: { select: { nome: true, email: true } },
+                    categoria: { select: { nome_categoria: true } }
                 },
-
-                orderBy: {
-                    dataevento: 'desc'
-                }
+                orderBy: { dataevento: 'desc' }
             });
+
+            if (listaDeItens.length === 0) {
+                return res.status(200).json({
+                    status: 'erro',
+                    mensagem: 'Nenhum item encontrado',
+                    dados: []
+                });
+            }
 
             res.status(200).json({
                 status: 'sucesso',
@@ -54,7 +63,7 @@ module.exports = {
                 status: 'erro',
                 mensagem: 'Erro ao buscar itens',
                 detalhes: error.message
-            })
+            });
         }
     },
 
@@ -63,17 +72,20 @@ module.exports = {
             const itensPerdidos = await prisma.item.findMany({
                 where: { status: 0 },
                 include: {
-                    usuarios: {
-                        select: { nome: true, email: true }
-                    },
-                    categoria: {
-                        select: { nome_categoria: true }
-                    }
+                    usuarios: { select: { nome: true, email: true } },
+                    categoria: { select: { nome_categoria: true } }
                 },
-                orderBy: {
-                    dataevento: 'desc'
-                }
+                orderBy: { dataevento: 'desc' }
             });
+
+            if (itensPerdidos.length === 0) {
+                return res.status(200).json({
+                    status: 'erro',
+                    mensagem: 'Nenhum item encontrado',
+                    dados: []
+                });
+            }
+
             res.json({
                 status: 'sucesso',
                 mensagem: 'Lista de Itens Perdidos',
@@ -85,43 +97,45 @@ module.exports = {
             res.status(500).json({
                 status: 'erro',
                 mensagem: 'Erro interno do servidor',
-                detalhes: error.meta?.target || error.message
+                detalhes: error.message
             });
         }
     },
-
 
     async listarItensAchados(req, res) {
         try {
             const itensAchados = await prisma.item.findMany({
                 where: { status: 1 },
                 include: {
-                    usuarios: {
-                        select: { nome: true, email: true }
-                    },
-                    categoria: {
-                        select: { nome_categoria: true }
-                    }
+                    usuarios: { select: { nome: true, email: true } },
+                    categoria: { select: { nome_categoria: true } }
                 },
-                orderBy: {
-                    dataevento: 'desc'
-                }
+                orderBy: { dataevento: 'desc' }
             });
+
+            if (itensAchados.length === 0) {
+                return res.status(200).json({
+                    status: 'erro',
+                    mensagem: 'Nenhum item encontrado',
+                    dados: []
+                });
+            }
+
             res.json({
                 status: 'sucesso',
                 mensagem: 'Lista de Itens Achados',
                 dados: itensAchados
             });
+
         } catch (error) {
-            console.error('Erro ao buscar itens perdidos:', error);
+            console.error('Erro ao buscar itens achados:', error);
             res.status(500).json({
                 status: 'erro',
                 mensagem: 'Erro interno do servidor',
-                detalhes: error.meta?.target || error.message
+                detalhes: error.message
             });
         }
     },
-
 
     async listarItemPorCodigo(req, res) {
         const { codigoacesso } = req.params;
@@ -130,17 +144,8 @@ module.exports = {
             const itemCodigo = await prisma.item.findUnique({
                 where: { codigoacesso },
                 include: {
-                    usuarios: {
-                        select: {
-                            nome: true,
-                            email: true
-                        }
-                    },
-                    categoria: {
-                        select: {
-                            nome_categoria: true
-                        }
-                    }
+                    usuarios: { select: { nome: true, email: true } },
+                    categoria: { select: { nome_categoria: true } }
                 }
             });
 
@@ -150,6 +155,7 @@ module.exports = {
                     mensagem: 'Item não encontrado com esse código de acesso'
                 });
             }
+
             res.status(200).json({
                 status: 'sucesso',
                 mensagem: 'Item encontrado!',
@@ -161,36 +167,26 @@ module.exports = {
             res.status(500).json({
                 status: 'erro',
                 mensagem: 'Erro interno ao buscar item pelo código de acesso',
-                detalhes: error.meta?.target || error.message
+                detalhes: error.message
             });
         }
     },
 
-
     async cadastrarItem(req, res) {
-        const {
-            nome_objeto, dataevento, localizacao, status, categoria_id, usuario_id } = req.body;
+        const { nome_objeto, dataevento, localizacao, status, categoria_id, usuario_id } = req.body;
 
         if (!nome_objeto || !dataevento || !localizacao || status === undefined || !categoria_id || !usuario_id) {
             return res.status(400).json({
                 status: 'erro',
                 mensagem: 'Todos os campos são obrigatórios'
-            })
-        }
-
-        if (nome_objeto.length < 3) {
-            return res.status(400).json({
-                status: 'erro',
-                mensagem: 'O nome do objeto deve ter pelo menos 3 caracteres'
             });
         }
 
-        if (localizacao.length < 3) {
+        if (nome_objeto.length < 3 || localizacao.length < 3) {
             return res.status(400).json({
                 status: 'erro',
-                mensagem: 'A localização deve ter pelo menos 3 caracteres'
+                mensagem: 'Nome e localização devem ter pelo menos 3 caracteres'
             });
-
         }
 
         if (isNaN(Date.parse(dataevento))) {
@@ -200,13 +196,7 @@ module.exports = {
             });
         }
 
-        const statusMap = {
-            perdido: 0,
-            encontrado: 1
-        }
-
-        const statusFormatado = statusMap[String(status)?.toLowerCase()]
-
+        const statusFormatado = formatarStatus(status);
         if (statusFormatado === undefined) {
             return res.status(400).json({
                 status: 'erro',
@@ -223,8 +213,8 @@ module.exports = {
                     localizacao,
                     status: statusFormatado,
                     codigoacesso: codigo,
-                    categoria_id,
-                    usuario_id
+                    categoria_id: Number(categoria_id),
+                    usuario_id: Number(usuario_id)
                 }
             });
 
@@ -240,13 +230,14 @@ module.exports = {
             res.status(500).json({
                 status: 'erro',
                 mensagem: 'Erro ao cadastrar item',
-                detalhes: error.meta?.target || error.message
-            })
+                detalhes: error.message
+            });
         }
     },
 
     async atualizarItem(req, res) {
         const { id } = req.params;
+        const { nome_objeto, dataevento, localizacao, status } = req.body;
 
         if (!id || isNaN(Number(id))) {
             return res.status(400).json({
@@ -255,33 +246,22 @@ module.exports = {
             });
         }
 
-        const { nome_objeto, dataevento, localizacao, status } = req.body
-
         const dataAtualizacao = {};
 
         if (nome_objeto) dataAtualizacao.nome_objeto = nome_objeto;
-
         if (dataevento && !isNaN(Date.parse(dataevento))) {
             dataAtualizacao.dataevento = new Date(dataevento);
         }
-
         if (localizacao) dataAtualizacao.localizacao = localizacao;
 
         if (status !== undefined) {
-            const statusMap = {
-                perdido: 0,
-                encontrado: 1
-            }
-
-            const statusFormatado = statusMap[String(status)?.toLowerCase()];
-
+            const statusFormatado = formatarStatus(status);
             if (statusFormatado === undefined) {
                 return res.status(400).json({
                     status: 'erro',
                     mensagem: 'Status inválido. Use "perdido" ou "encontrado"'
                 });
             }
-
             dataAtualizacao.status = statusFormatado;
         }
 
@@ -305,12 +285,12 @@ module.exports = {
             });
 
         } catch (error) {
-            console.error('Erro ao atualizar item');
+            console.error('Erro ao atualizar item', error);
             res.status(404).json({
                 status: 'erro',
                 mensagem: 'Erro ao atualizar item',
-                detalhes: error.meta?.target || error.message
-            })
+                detalhes: error.message
+            });
         }
     },
 
@@ -321,26 +301,19 @@ module.exports = {
         const dataAtualizacao = {};
 
         if (nome_objeto) dataAtualizacao.nome_objeto = nome_objeto;
-
         if (dataevento && !isNaN(Date.parse(dataevento))) {
             dataAtualizacao.dataevento = new Date(dataevento);
         }
         if (localizacao) dataAtualizacao.localizacao = localizacao;
 
         if (status !== undefined) {
-            const statusMap = {
-                perdido: 0,
-                encontrado: 1
-            };
-
-            const statusFormatado = statusMap[String(status)?.toLowerCase()];
+            const statusFormatado = formatarStatus(status);
             if (statusFormatado === undefined) {
                 return res.status(400).json({
                     status: 'erro',
                     mensagem: 'Status inválido. Use "perdido" ou "encontrado"'
                 });
             }
-
             dataAtualizacao.status = statusFormatado;
         }
 
@@ -362,23 +335,25 @@ module.exports = {
                 mensagem: 'Item atualizado com sucesso!',
                 dados: itemAtualizado
             });
+
         } catch (error) {
             console.error('Erro ao atualizar item via código de acesso', error);
             res.status(404).json({
                 status: 'erro',
                 mensagem: 'Item não encontrado ou erro ao atualizar',
-                detalhes: error.meta?.target || error.message
+                detalhes: error.message
             });
         }
     },
 
     async excluirItem(req, res) {
-        const { id } = req.params
+        const { id } = req.params;
 
         try {
             const itemExcluido = await prisma.item.delete({
                 where: { id: Number(id) }
             });
+
             return res.status(200).json({
                 status: 'sucesso',
                 mensagem: 'Item excluído com sucesso!',
@@ -390,7 +365,7 @@ module.exports = {
             return res.status(404).json({
                 status: 'erro',
                 mensagem: 'Erro ao excluir item',
-                detalhes: error.meta?.target || error.message
+                detalhes: error.message
             });
         }
     },
@@ -399,7 +374,6 @@ module.exports = {
         const { codigoacesso } = req.params;
 
         try {
-
             const item = await prisma.item.findUnique({
                 where: { codigoacesso }
             });
@@ -420,13 +394,14 @@ module.exports = {
                 mensagem: 'Item excluído via código de acesso',
                 dados: itemExcluidoCodigo
             });
+
         } catch (error) {
             console.error('Erro ao excluir item por código de acesso:', error);
-            return res.status(404).json({
+            return res.status(500).json({
                 status: 'erro',
-                mensagem: 'Item não encontrado com este código de acesso',
-                detalhes: error.meta?.target || error.message
+                mensagem: 'Erro ao excluir item por código de acesso',
+                detalhes: error.message
             });
         }
     }
-}
+};
