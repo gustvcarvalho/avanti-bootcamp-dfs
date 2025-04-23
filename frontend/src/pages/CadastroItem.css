@@ -1,0 +1,107 @@
+/* src/pages/CadastroItem.css */
+
+.cadastro-wrapper {
+  min-height: 100vh;
+  background-color: #330033;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.cadastro-container {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 420px;
+  margin-bottom: 40px;
+}
+
+.cadastro-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.cadastro-form h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+  font-weight: 600;
+  font-size: 24px;
+}
+
+.cadastro-form label {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.cadastro-form input,
+.cadastro-form select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+
+.cadastro-form button {
+  background-color: #330033;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  margin-top: 10px;
+}
+
+.cadastro-form button:hover {
+  background-color: #2b5876;
+}
+
+.lista-itens {
+  background-color: #ffffffdd;
+  color: #333;
+  padding: 25px;
+  border-radius: 12px;
+  max-width: 800px;
+  width: 100%;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.lista-itens h3 {
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+  color: #333;
+  text-align: center;
+}
+
+.grid-itens {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.item-card {
+  background-color: #f4f4f4;
+  padding: 15px 20px;
+  border-radius: 10px;
+  border-left: 6px solid #4e4376;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.item-card p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.item-card strong {
+  color: #111;
+}
