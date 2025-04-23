@@ -1,0 +1,65 @@
+usuario
+
+[
+  {
+    "nome": "Juliana Silva",
+    "email": "juliana@teste.com.br",
+    "telefone": "33991234567",
+    "senha": "juliana123"
+  },
+  {
+    "nome": "Carlos Mendes",
+    "email": "carlos@teste.com.br",
+    "telefone": "33997654321",
+    "senha": "carlos321"
+  },
+  {
+    "nome": "Fernanda Rocha",
+    "email": "fernanda@teste.com.br",
+    "telefone": "33999887766",
+    "senha": "fersenha456"
+  },
+  {
+    "nome": "Thiago Oliveira",
+    "email": "thiago@teste.com.br",
+    "telefone": "33991122334",
+    "senha": "thiagopass"
+  }
+]
+
+Item
+
+[
+  {
+    "nome_objeto": "Celular Motorola",
+    "dataevento": "2025-04-06T15:30:00Z",
+    "localizacao": "Bloco A - Corredor 2",
+    "status": "perdido",
+    "categoria_id": 2,
+    "usuario_id": 1
+  },
+  {
+    "nome_objeto": "Chave de casa com chaveiro do Batman",
+    "dataevento": "2025-04-05T10:15:00Z",
+    "localizacao": "Banheiro do 1º andar",
+    "status": "perdido",
+    "categoria_id": 1,
+    "usuario_id": 2
+  },
+  {
+    "nome_objeto": "Carteira marrom com documentos",
+    "dataevento": "2025-04-03T09:00:00Z",
+    "localizacao": "Biblioteca Central",
+    "status": "perdido",
+    "categoria_id": 3,
+    "usuario_id": 3
+  },
+  {
+    "nome_objeto": "Blusa azul escura",
+    "dataevento": "2025-04-01T17:45:00Z",
+    "localizacao": "Cantina",
+    "status": "encontrado",
+    "categoria_id": 4,
+    "usuario_id": 4
+  }
+]
